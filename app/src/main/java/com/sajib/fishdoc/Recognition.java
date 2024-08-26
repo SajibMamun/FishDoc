@@ -4,22 +4,16 @@ import android.graphics.RectF;
 
 public class Recognition {
 
-    /**
-     * Display name for the recognition.
-     */
+
     private Integer labelId;
     private String labelName;
     private Float labelScore;
 
-    /**
-     * A sortable score for how good the recognition is relative to others. Higher should be better.
-     */
+
     private Float confidence;
 
 
-    /**
-     * Optional location within the source image for the location of the recognized object.
-     */
+
     private RectF location;
 
     public Recognition(

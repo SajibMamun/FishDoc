@@ -28,15 +28,14 @@ public class MainActivity extends AppCompatActivity {
     private final int IMAGE_PICK = 100;
     private final int CAMERA_CAPTURE = 101;
 
-    CardView layout1;
-    ImageView imageView, camerabtn;
 
+    ImageView imageView, camerabtn;
 
 
     Bitmap bitmap;
     Button predictbtn, againbtn;
-    ScrollView scrollView1;
-    TextView detecclasstv,suggestiontv;
+    LinearLayout layout1card, layout2img, layout3scroll;
+    TextView detecclasstv, suggestiontv;
 
     Yolov5TFLiteDetector yolov5TFLiteDetector;
     Paint boxPaint = new Paint();
@@ -50,11 +49,13 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.imageview);
         againbtn = findViewById(R.id.againbtn);
-        layout1 = findViewById(R.id.layout1);
+        layout1card = findViewById(R.id.layout1);
+        layout2img = findViewById(R.id.layout2image);
+        layout3scroll = findViewById(R.id.layout3scroll);
         camerabtn = findViewById(R.id.camerabtn);
-        scrollView1=findViewById(R.id.scrollviewid);
-        detecclasstv=findViewById(R.id.classnametv);
 
+        detecclasstv = findViewById(R.id.classnametv);
+        suggestiontv = findViewById(R.id.suggestionstv);
 
 
         yolov5TFLiteDetector = new Yolov5TFLiteDetector();
@@ -72,8 +73,9 @@ public class MainActivity extends AppCompatActivity {
         camerabtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                layout1.setVisibility(View.GONE);
-               imageView.setVisibility(View.VISIBLE);
+                layout1card.setVisibility(View.GONE);
+                layout2img.setVisibility(View.VISIBLE);
+                layout3scroll.setVisibility(View.GONE);
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, CAMERA_CAPTURE);
@@ -82,19 +84,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
     }
 
     public void selectImage(View view) {
-        layout1.setVisibility(View.GONE);
-        imageView.setVisibility(View.VISIBLE);
+        layout1card.setVisibility(View.GONE);
+        layout2img.setVisibility(View.VISIBLE);
+        layout3scroll.setVisibility(View.GONE);
 
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, IMAGE_PICK);
     }
-
 
 
     @Override
@@ -113,22 +114,27 @@ public class MainActivity extends AppCompatActivity {
                 Canvas canvas = new Canvas(mutableBitmap);
 
                 StringBuilder detectedClasses = new StringBuilder();
+                StringBuilder suggestions = new StringBuilder();
 
                 for (Recognition recognition : recognitions) {
                     if (recognition.getConfidence() > 0.4) {
                         RectF location = recognition.getLocation();
                         canvas.drawRect(location, boxPaint);
                         canvas.drawText(recognition.getLabelName(), location.left, location.top, textPain);
-
+                        String className = recognition.getLabelName();
                         detectedClasses.append(recognition.getLabelName()).append("\n");
+                        // Get suggestion for each detected class and append it
+                        suggestions.append(getSuggestionForClass(className)).append("\n");
                     }
                 }
 
                 imageView.setImageBitmap(mutableBitmap);
-                scrollView1.setVisibility(View.VISIBLE);
+                layout3scroll.setVisibility(View.VISIBLE);
 
                 // Set the detected class names to the TextView
                 detecclasstv.setText(detectedClasses.toString().trim());
+                // Set the suggestions to the suggestion TextView
+                suggestiontv.setText(suggestions.toString().trim());
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -144,34 +150,57 @@ public class MainActivity extends AppCompatActivity {
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             Canvas canvas = new Canvas(mutableBitmap);
 
+
             StringBuilder detectedClasses = new StringBuilder();
+            StringBuilder suggestions = new StringBuilder();
 
             for (Recognition recognition : recognitions) {
                 if (recognition.getConfidence() > 0.4) {
                     RectF location = recognition.getLocation();
                     canvas.drawRect(location, boxPaint);
                     canvas.drawText(recognition.getLabelName(), location.left, location.top, textPain);
-
+                    String className = recognition.getLabelName();
                     detectedClasses.append(recognition.getLabelName()).append("\n");
+                    // Get suggestion for each detected class and append it
+                    suggestions.append(getSuggestionForClass(className)).append("\n");
                 }
             }
 
             imageView.setImageBitmap(mutableBitmap);
-            scrollView1.setVisibility(View.VISIBLE);
+            layout3scroll.setVisibility(View.VISIBLE);
 
             // Set the detected class names to the TextView
             detecclasstv.setText(detectedClasses.toString().trim());
+            // Set the suggestions to the suggestion TextView
+            suggestiontv.setText(suggestions.toString().trim());
 
 
         }
     }
 
 
+    private String getSuggestionForClass(String className) {
+        switch (className.toLowerCase()) {
+            case "cloudy eye":
+                return "Cloudy Eye: Make sure that water changes are made with water at about the same temperature as your tank. Additionally, check your pH, especially if your water is soft. Other possible contributing factors are: stress, malnutrition (lack of vitamin A,) injury to the eye, old age (cataracts).\n";
+            case "eus":
+                return "EUS: Control of EUS in natural waters is probably impossible. In outbreaks occurring in small, closed water- bodies or fish ponds, liming water with agricultural limes and improving water quality, together with removal of infected fish, is often effective in reducing mortalities and controlling the disease.\n";
+            case "fin rot":
+                return "Fin Rot: Fin rot can be prevented with good water quality, feeding fresh food in small portions and maintaining constant water temperature. Keeping the tank from becoming cluttered (for domestic fish) will also help prevent fin rot.\n";
+            case "gill flukes":
+                return "Gill Flukes: Provide your fish with a low-stress environment. This includes good water quality and maintenance practices, feeding a proper, nutritious diet, and adhering to strict quarantine protocols for all new additions to the tank.\n";
+            case "hexamita":
+                return "Hexamita: Taking care that fish will dispose of and keep sufficient resistance. It is absolutely necessary to feed the fish in your pond on high grade fish feed.\n";
+            default:
+                return "Disease Information Not Available. Stay Connect With Us For Future Update.\n";
+        }
+    }
+
+
     public void Againbtnclicked(View view) {
-        imageView.setVisibility(View.GONE);
-        layout1.setVisibility(View.VISIBLE);
-        againbtn.setVisibility(View.GONE);
-        scrollView1.setVisibility(View.GONE);
+        layout2img.setVisibility(View.GONE);
+        layout1card.setVisibility(View.VISIBLE);
+        layout3scroll.setVisibility(View.GONE);
         imageView.setImageBitmap(null);
     }
 }
