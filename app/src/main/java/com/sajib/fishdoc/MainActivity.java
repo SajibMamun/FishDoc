@@ -18,6 +18,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,8 +31,12 @@ public class MainActivity extends AppCompatActivity {
     CardView layout1;
     ImageView imageView, camerabtn;
 
+
+
     Bitmap bitmap;
     Button predictbtn, againbtn;
+    ScrollView scrollView1;
+    TextView detecclasstv,suggestiontv;
 
     Yolov5TFLiteDetector yolov5TFLiteDetector;
     Paint boxPaint = new Paint();
@@ -43,10 +49,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         imageView = findViewById(R.id.imageview);
-        predictbtn = findViewById(R.id.predictbtn);
         againbtn = findViewById(R.id.againbtn);
         layout1 = findViewById(R.id.layout1);
         camerabtn = findViewById(R.id.camerabtn);
+        scrollView1=findViewById(R.id.scrollviewid);
+        detecclasstv=findViewById(R.id.classnametv);
+
 
 
         yolov5TFLiteDetector = new Yolov5TFLiteDetector();
@@ -65,13 +73,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 layout1.setVisibility(View.GONE);
-                imageView.setVisibility(View.VISIBLE);
+               imageView.setVisibility(View.VISIBLE);
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takePictureIntent, CAMERA_CAPTURE);
                 }
             }
         });
+
+
+
     }
 
     public void selectImage(View view) {
@@ -84,23 +95,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, IMAGE_PICK);
     }
 
-    public void predict(View view) {
-        againbtn.setVisibility(View.VISIBLE);
 
-        ArrayList<Recognition> recognitions = yolov5TFLiteDetector.detect(bitmap);
-        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        Canvas canvas = new Canvas(mutableBitmap);
-
-        for (Recognition recognition : recognitions) {
-            if (recognition.getConfidence() > 0.4) {
-                RectF location = recognition.getLocation();
-                canvas.drawRect(location, boxPaint);
-                canvas.drawText(recognition.getLabelName(), location.left, location.top, textPain);
-            }
-        }
-
-        imageView.setImageBitmap(mutableBitmap);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -111,23 +106,72 @@ public class MainActivity extends AppCompatActivity {
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
                 imageView.setImageBitmap(bitmap);
-                predictbtn.setVisibility(View.VISIBLE);
+                //predictbtn.setVisibility(View.VISIBLE);
+
+                ArrayList<Recognition> recognitions = yolov5TFLiteDetector.detect(bitmap);
+                Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                Canvas canvas = new Canvas(mutableBitmap);
+
+                StringBuilder detectedClasses = new StringBuilder();
+
+                for (Recognition recognition : recognitions) {
+                    if (recognition.getConfidence() > 0.4) {
+                        RectF location = recognition.getLocation();
+                        canvas.drawRect(location, boxPaint);
+                        canvas.drawText(recognition.getLabelName(), location.left, location.top, textPain);
+
+                        detectedClasses.append(recognition.getLabelName()).append("\n");
+                    }
+                }
+
+                imageView.setImageBitmap(mutableBitmap);
+                scrollView1.setVisibility(View.VISIBLE);
+
+                // Set the detected class names to the TextView
+                detecclasstv.setText(detectedClasses.toString().trim());
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
+
         } else if (requestCode == CAMERA_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             bitmap = (Bitmap) extras.get("data");
             imageView.setImageBitmap(bitmap);
-            predictbtn.setVisibility(View.VISIBLE);
+            //predictbtn.setVisibility(View.VISIBLE);
+            ArrayList<Recognition> recognitions = yolov5TFLiteDetector.detect(bitmap);
+            Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            Canvas canvas = new Canvas(mutableBitmap);
+
+            StringBuilder detectedClasses = new StringBuilder();
+
+            for (Recognition recognition : recognitions) {
+                if (recognition.getConfidence() > 0.4) {
+                    RectF location = recognition.getLocation();
+                    canvas.drawRect(location, boxPaint);
+                    canvas.drawText(recognition.getLabelName(), location.left, location.top, textPain);
+
+                    detectedClasses.append(recognition.getLabelName()).append("\n");
+                }
+            }
+
+            imageView.setImageBitmap(mutableBitmap);
+            scrollView1.setVisibility(View.VISIBLE);
+
+            // Set the detected class names to the TextView
+            detecclasstv.setText(detectedClasses.toString().trim());
+
+
         }
     }
+
 
     public void Againbtnclicked(View view) {
         imageView.setVisibility(View.GONE);
         layout1.setVisibility(View.VISIBLE);
-        predictbtn.setVisibility(View.GONE);
         againbtn.setVisibility(View.GONE);
+        scrollView1.setVisibility(View.GONE);
         imageView.setImageBitmap(null);
     }
 }
