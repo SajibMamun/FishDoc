@@ -1,10 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Tips">
+    tools:context=".Tips"
+    android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Important Tips"
+        android:layout_marginTop="150dp"
+        android:layout_marginLeft="20dp"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#087B57"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=".Maintain Water Quality"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=".Proper Filtration"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="20dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=".Balanced Diet"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="20dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=".Avoid Overcrowding"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="20dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=".Monitor Fish Behavior"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="20dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="96dp"
+            android:fontFamily="@font/nunitobold"
+            android:text="Swipe Right"
+            android:textColor="#087B57"
+            android:textSize="23sp"
+
+
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.501" />
+
+        <ImageView
+            android:id="@+id/nextbtnid"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:onClick="Nextbtnclicked"
+            android:src="@drawable/arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.618"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
